@@ -40,7 +40,7 @@ class Code(models.Model):
     secure_index = models.CharField(
         max_length=64, unique=True, default=None
     )  # SHA256(signature)
-    qr_image = models.ImageField(upload_to="qr_codes/", null=True, blank=True)
+    qr_image = models.ImageField(upload_to="qr_codes_test/", null=True, blank=True)
     status = models.CharField(
         max_length=50,
         choices=[

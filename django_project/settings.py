@@ -29,11 +29,7 @@ DEBUG = (
     else bool(debug_value)
 )
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = [
-    ".railway.app",  # https://saas.prod.railway.app
-    "billeterie-production.up.railway.app",
-    "billeterie-iiw0.onrender.com",
-]
+ALLOWED_HOSTS = ["qrvibe-version1.onrender.com"]
 if DEBUG:
     ALLOWED_HOSTS += ["127.0.0.1", "localhost"]
 
@@ -120,17 +116,6 @@ else:
             "NAME": BASE_DIR / "db.sqlite3",
         }
     }
-# For Docker/PostgreSQL usage uncomment this and comment the DATABASES config above
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": "postgres",
-#         "USER": "postgres",
-#         "PASSWORD": "postgres",
-#         "HOST": "db",  # set in docker-compose.yml
-#         "PORT": 5432,  # default postgres port
-#     }
-# }
 
 # Password validation
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-password-validators
@@ -202,11 +187,12 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 # EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = "achafine@gmail.com"
-EMAIL_HOST_PASSWORD = "aiblbikhbzjkjucu"
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT"))
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS").lower() == "true"
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+
 # https://docs.djangoproject.com/en/dev/ref/settings/#default-from-email
 # DEFAULT_FROM_EMAIL = "root@localhost"
 
@@ -248,20 +234,9 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#csrf-trusted-origins
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:8000",  # Default Django dev server
-    "http://127.0.0.1:8000",  # Alternative local address
-    "https://*.railway.app",
-    "https://billeterie-production.up.railway.app",
-    "https://billeterie-iiw0.onrender.com/",
-]
-
-
-# fedapay.api_key = os.getenv("FEDAPAY_KEY")
-#
-# session = fedapay.Transaction.create(
-#     amount=1500,
-#     description="Génération de QR codes premium",
-#     currency="XOF",
-#     callback_url="https://127.0.0.1:8000/payment/callback/",
-# )
+CSRF_TRUSTED_ORIGINS = ["https://qrvibe-version1.onrender.com/"]
+if DEBUG:
+    CSRF_TRUSTED_ORIGINS += [
+        "http://localhost:8000",  # Default Django dev server
+        "http://127.0.0.1:8000",  # Alternative local address
+    ]

@@ -1,0 +1,292 @@
+<!-- verify_code.html -->
+{% extends 'base.html' %}
+
+{% block title %}QRVibe - Vérifier un code{% endblock %}
+
+{% block custom_style %}
+<style>
+    .verify-section {
+        padding: 6rem 0;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        position: relative;
+        overflow: hidden;
+        min-height: 90vh;
+    }
+
+    .verify-section::before {
+        content: '';
+        position: absolute;
+        width: 500px;
+        height: 500px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        top: -200px;
+        right: -100px;
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .verify-section::after {
+        content: '';
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        bottom: -100px;
+        left: -50px;
+        animation: float 8s ease-in-out infinite reverse;
+    }
+
+    .verify-card {
+        background: white;
+        border-radius: 24px;
+        padding: 2.5rem;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        color: var(--dark);
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        border-radius: 20px 20px 0 0 !important;
+    }
+
+    .form-control {
+        border-radius: 50px;
+    }
+
+    .btn-outline-primary {
+        border-radius: 50px;
+    }
+
+    #my-qr-reader {
+        padding: 1rem;
+        background: var(--light);
+        border-radius: 20px;
+    }
+
+    .separator {
+        position: relative;
+        margin: 2rem 0;
+        text-align: center;
+        color: #666;
+    }
+
+    .separator::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background: var(--gray);
+        z-index: -1;
+    }
+
+    .separator span {
+        background: white;
+        padding: 0 1rem;
+    }
+
+    #result .alert {
+        border-radius: 20px;
+    }
+
+    @media (max-width: 768px) {
+        .verify-card {
+            padding: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="verify-section">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="verify-card animate-on-scroll">
+                    <div class="card-header text-center">
+                        <h2 class="mb-0">
+                            <i class="bi bi-qr-code-scan me-2"></i>
+                            Vérifier un code
+                        </h2>
+                    </div>
+                    
+                    <div class="card-body p-4">
+                        <!-- Scanner QR Code -->
+                        <div class="mb-4">
+                            <h5 class="text-center mb-3">
+                                <i class="bi bi-camera me-2"></i>Scanner un QR Code
+                            </h5>
+                            <div class="border rounded p-3 bg-light">
+                                <div id="my-qr-reader"></div>
+                            </div>
+                        </div>
+
+                        <!-- Séparateur -->
+                        <div class="separator my-4">
+                            <span>OU</span>
+                        </div>
+
+                        <!-- Upload d'image -->
+                        <div class="mb-4">
+                            <h5 class="text-center mb-3">
+                                <i class="bi bi-upload me-2"></i>Uploader une image QR Code
+                            </h5>
+                            <form id="uploadForm" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="input-group">
+                                    <input type="file" class="form-control" id="qrImage" name="qr_image" accept="image/*">
+                                    <button type="submit" class="btn btn-outline-primary">
+                                        <i class="bi bi-check me-1"></i>Vérifier
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Saisie manuelle -->
+                        <div>
+                            <h5 class="text-center mb-3">
+                                <i class="bi bi-keyboard me-2"></i>Saisie manuelle
+                            </h5>
+                            <form id="manualForm">
+                                {% csrf_token %}
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="secureIndex" 
+                                           name="secure_index" placeholder="Entrez le code sécurisé" required>
+                                    <button type="submit" class="btn btn-outline-primary">
+                                        <i class="bi bi-check me-1"></i>Vérifier
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Résultat -->
+                        <div id="result" class="mt-4"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block custom_script %}
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+function domReady(fn) {
+    if (document.readyState === "complete" || document.readyState === "interactive") {
+        setTimeout(fn, 1000);
+    } else {
+        document.addEventListener("DOMContentLoaded", fn);
+    }
+}
+
+// Fonction pour afficher les résultats
+function showResult(message, isSuccess) {
+    const resultDiv = document.getElementById('result');
+    const alertClass = isSuccess ? 'alert-success' : 'alert-danger';
+    resultDiv.innerHTML = `
+        <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    `;
+}
+
+// Fonction pour envoyer la requête de vérification
+function verifyCode(secureIndex) {
+    const formData = new FormData();
+    formData.append('secure_index', secureIndex);
+    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+    fetch('', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showResult(`
+                <h5><i class="bi bi-check-circle me-2"></i>${data.message}</h5>
+                <p class="mb-0"><strong>Lot:</strong> ${data.batch_name}</p>
+                <p class="mb-0"><strong>Date de création:</strong> ${new Date(data.created_at).toLocaleString()}</p>
+            `, true);
+        } else {
+            let message = data.message;
+            if (data.status === 'expire') {
+                message = '<i class="bi bi-exclamation-triangle me-2"></i>' + message;
+            } else if (data.status === 'utilise') {
+                message = '<i class="bi bi-x-circle me-2"></i>' + message;
+            }
+            showResult(message, false);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showResult('<i class="bi bi-exclamation-triangle me-2"></i>Erreur lors de la vérification', false);
+    });
+}
+
+domReady(function () {
+    // Configuration du scanner QR
+    let htmlscanner = new Html5QrcodeScanner(
+        "my-qr-reader",
+        { fps: 10, qrbox: 250 }
+    );
+
+    function onScanSuccess(decodeText, decodeResult) {
+        // Arrêter le scanner après succès
+        htmlscanner.clear();
+        verifyCode(decodeText);
+        
+        // Redémarrer le scanner après 3 secondes
+        setTimeout(() => {
+            htmlscanner.render(onScanSuccess);
+        }, 3000);
+    }
+
+    htmlscanner.render(onScanSuccess);
+
+    // Gestion de l'upload d'image
+    document.getElementById('uploadForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        
+        fetch('', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showResult(`
+                    <h5><i class="bi bi-check-circle me-2"></i>${data.message}</h5>
+                    <p class="mb-0"><strong>Lot:</strong> ${data.batch_name}</p>
+                    <p class="mb-0"><strong>Date de création:</strong> ${new Date(data.created_at).toLocaleString()}</p>
+                `, true);
+            } else {
+                showResult(data.message, false);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showResult('Erreur lors de l\'upload', false);
+        });
+    });
+
+    // Gestion de la saisie manuelle
+    document.getElementById('manualForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const secureIndex = document.getElementById('secureIndex').value.trim();
+        
+        if (secureIndex) {
+            verifyCode(secureIndex);
+            document.getElementById('secureIndex').value = '';
+        }
+    });
+});
+</script>
+{% endblock %}

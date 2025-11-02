@@ -1,0 +1,10 @@
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "./Dockerfile"
+watchPatterns = [
+  "requirements.txt",
+  "railway.toml",
+  "Dockerfile",
+  "django_project/**",
+  "qrgenerator/**",
+]

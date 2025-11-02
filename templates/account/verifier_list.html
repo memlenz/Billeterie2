@@ -1,0 +1,112 @@
+<!-- accounts/verifier_list.html -->
+{% extends 'base.html' %}
+
+{% block title %}QRVibe - Liste des vérificateurs{% endblock %}
+
+{% block custom_style %}
+<style>
+    .verifier-list-section {
+        padding: 6rem 0;
+        background: var(--light);
+    }
+
+    .header-section {
+        margin-bottom: 3rem;
+    }
+
+    .list-card {
+        border-radius: 20px;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .no-verifiers {
+        padding: 3rem 0;
+    }
+
+    .btn-primary-custom {
+        border-radius: 50px;
+    }
+
+    @media (max-width: 768px) {
+        .header-section {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .header-section .btn {
+            margin-top: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="verifier-list-section">
+    <div class="container">
+        <div class="header-section d-flex justify-content-between align-items-center mb-4 animate-on-scroll">
+            <h1>Liste des vérificateurs 👥</h1>
+            <a href="{% url 'verifier_create' %}" class="btn btn-primary-custom">
+                <i class="bi bi-person-plus"></i> Créer un vérificateur
+            </a>
+        </div>
+
+        <div class="list-card card animate-on-scroll">
+            <div class="card-header">
+                <h5 class="section-title mb-0">Mes vérificateurs 🌟</h5>
+            </div>
+            <div class="card-body">
+                {% if verifiers %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Nom d'utilisateur</th>
+                                    <th>Email</th>
+                                    <th>Date de création</th>
+                                    <th>Statut</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for verifier in verifiers %}
+                                <tr>
+                                    <td>{{ verifier.username }}</td>
+                                    <td>{{ verifier.email }}</td>
+                                    <td>{{ verifier.date_joined|date:"d/m/Y H:i" }}</td>
+                                    <td>
+                                        <span class="badge {% if verifier.is_active %}bg-success{% else %}bg-danger{% endif %}">
+                                            {% if verifier.is_active %}Actif{% else %}Inactif{% endif %}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="#" class="btn btn-outline-primary" title="Modifier">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a href="#" class="btn btn-outline-danger" title="Supprimer">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4 no-verifiers">
+                        <i class="bi bi-people fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">Aucun vérificateur créé pour le moment.</p>
+                        <a href="{% url 'verifier_create' %}" class="btn btn-primary-custom">
+                            Créer votre premier vérificateur
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

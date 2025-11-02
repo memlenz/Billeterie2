@@ -1,0 +1,113 @@
+<!-- 404.html -->
+{% extends 'base.html' %}
+
+{% block title %}QRVibe - Erreur 404{% endblock %}
+
+{% block custom_style %}
+<style>
+    .error-section {
+        padding: 8rem 0;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        text-align: center;
+        min-height: 100vh;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .error-section::before {
+        content: '';
+        position: absolute;
+        width: 500px;
+        height: 500px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        top: -200px;
+        right: -100px;
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .error-section::after {
+        content: '';
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        bottom: -100px;
+        left: -50px;
+        animation: float 8s ease-in-out infinite reverse;
+    }
+
+    .error-card {
+        background: white;
+        border-radius: 24px;
+        padding: 3rem;
+        max-width: 500px;
+        margin: 0 auto;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        color: var(--dark);
+    }
+
+    .error-card h1 {
+        font-size: 4rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .error-card h2 {
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 1rem;
+    }
+
+    .error-card p {
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+    }
+
+    .btn-home {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        border: none;
+        padding: 1rem 3rem;
+        border-radius: 50px;
+        font-weight: 700;
+        color: white;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 191, 255, 0.3);
+    }
+
+    .btn-home:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 8px 25px rgba(0, 191, 255, 0.5);
+    }
+
+    @media (max-width: 768px) {
+        .error-card {
+            padding: 2rem;
+        }
+
+        .error-card h1 {
+            font-size: 3rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <section class="error-section">
+        <div class="container">
+            <div class="error-card animate-on-scroll">
+                <h1>404</h1>
+                <h2>Page non trouvée 😕</h2>
+                <p>La page que vous cherchez n'existe pas ou a été déplacée. Essayez de vérifier l'URL ou revenez à l'accueil.</p>
+                <a href="{% url 'home' %}" class="btn btn-home">Retour à l'accueil</a>
+            </div>
+        </div>
+    </section>
+{% endblock %}

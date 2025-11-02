@@ -1,0 +1,416 @@
+{% extends 'base.html' %}
+
+{% block title %}QRVibe - À Propos{% endblock %}
+
+{% block custom_style %}
+<style>
+    /* Styles spécifiques à about.html */
+
+    body {
+        padding-top: 70px;
+    }
+
+    /* Hero About */
+    .hero-about {
+        padding: 6rem 0 4rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-about::before {
+        content: '✨';
+        position: absolute;
+        font-size: 10rem;
+        opacity: 0.1;
+        top: -50px;
+        right: 10%;
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .hero-about::after {
+        content: '🚀';
+        position: absolute;
+        font-size: 8rem;
+        opacity: 0.1;
+        bottom: -30px;
+        left: 15%;
+        animation: float 8s ease-in-out infinite reverse;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(10deg); }
+    }
+
+    .hero-about h1 {
+        font-size: clamp(2.5rem, 6vw, 4rem);
+        font-weight: 800;
+        margin-bottom: 1rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .hero-about p {
+        font-size: 1.3rem;
+        max-width: 700px;
+        margin: 0 auto;
+        opacity: 0.95;
+        position: relative;
+        z-index: 2;
+    }
+
+    /* Story Section */
+    .story-section {
+        padding: 5rem 0;
+        background: white;
+    }
+
+    .story-card {
+        background: var(--light);
+        border-radius: 24px;
+        padding: 3rem;
+        margin-bottom: 3rem;
+        border-left: 6px solid var(--accent);
+        transition: all 0.3s ease;
+    }
+
+    .story-card:hover {
+        transform: translateX(10px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .story-card h3 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 1.5rem;
+    }
+
+    .story-card p {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #555;
+    }
+
+    /* Values Section */
+    .values-section {
+        padding: 5rem 0;
+        background: linear-gradient(180deg, white 0%, var(--light) 100%);
+    }
+
+    .section-title {
+        font-size: clamp(2rem, 5vw, 3rem);
+        font-weight: 800;
+        text-align: center;
+        margin-bottom: 4rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .value-card {
+        background: white;
+        border-radius: 24px;
+        padding: 2.5rem;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        transition: all 0.4s ease;
+        height: 100%;
+        border: 3px solid transparent;
+    }
+
+    .value-card:hover {
+        transform: translateY(-10px);
+        border-color: var(--secondary);
+        box-shadow: 0 15px 40px rgba(255, 105, 180, 0.2);
+    }
+
+    .value-icon {
+        font-size: 4rem;
+        margin-bottom: 1.5rem;
+        display: inline-block;
+        animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-15px); }
+    }
+
+    .value-card h4 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 1rem;
+    }
+
+    .value-card p {
+        color: #666;
+        line-height: 1.7;
+    }
+
+    /* Team Section */
+    .team-section {
+        padding: 5rem 0;
+        background: white;
+    }
+
+    .team-member {
+        text-align: center;
+        margin-bottom: 3rem;
+        transition: all 0.3s ease;
+    }
+
+    .team-member:hover {
+        transform: scale(1.05);
+    }
+
+    .team-avatar {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4rem;
+        color: white;
+        margin: 0 auto 1.5rem;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        transition: all 0.3s ease;
+    }
+
+    .team-member:hover .team-avatar {
+        transform: rotate(360deg);
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+    }
+
+    .team-member h5 {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 0.5rem;
+    }
+
+    .team-member p {
+        color: #666;
+        font-size: 1rem;
+    }
+
+    /* Stats Section */
+    .stats-section {
+        padding: 5rem 0;
+        background: linear-gradient(135deg, var(--secondary), var(--accent));
+        color: white;
+    }
+
+    .stat-box {
+        text-align: center;
+        padding: 2rem;
+    }
+
+    .stat-number {
+        font-size: 4rem;
+        font-weight: 800;
+        display: block;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .stat-label {
+        font-size: 1.2rem;
+        opacity: 0.95;
+    }
+
+    @media (max-width: 768px) {
+        .story-card {
+            padding: 2rem;
+        }
+
+        .value-card {
+            margin-bottom: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <!-- Hero About -->
+    <section class="hero-about">
+        <div class="container">
+            <h1>Notre histoire 💫</h1>
+            <p>Comment QRVibe est né d'une envie folle de connecter les gens autrement</p>
+        </div>
+    </section>
+
+    <!-- Story Section -->
+    <section class="story-section">
+        <div class="container">
+            <div class="story-card animate-on-scroll">
+                <h3>🚀 Le début de l'aventure</h3>
+                <p>
+                    Tout a commencé lors d'un festival de musique en 2024. On galérait à partager les infos 
+                    de notre afterparty avec nos potes. Les flyers ? Trop old school. Les liens Instagram ? 
+                    Perdus dans la masse. C'est là qu'on s'est dit : "Et si on créait un moyen simple, fun 
+                    et stylé de connecter les gens à leurs events ?"
+                </p>
+            </div>
+
+            <div class="story-card animate-on-scroll">
+                <h3>💡 La vision QRVibe</h3>
+                <p>
+                    QRVibe, c'est plus qu'un générateur de QR codes. C'est un pont entre le monde physique 
+                    et digital. Une façon de rendre chaque event, chaque rencontre, chaque moment partagé 
+                    plus connecté, plus mémorable. On voulait que créer et partager soit aussi fun que 
+                    l'event lui-même !
+                </p>
+            </div>
+
+            <div class="story-card animate-on-scroll">
+                <h3>🎯 Notre mission</h3>
+                <p>
+                    Permettre à chaque créateur d'événements, qu'il organise une méga-soirée ou un simple 
+                    brunch entre amis, de générer des QR codes personnalisés qui reflètent vraiment l'énergie 
+                    de leur event. Parce que chaque vibe mérite son propre style ! 🔥
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Values Section -->
+    <section class="values-section">
+        <div class="container">
+            <h2 class="section-title animate-on-scroll">Nos valeurs 💜</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="value-card animate-on-scroll">
+                        <div class="value-icon">⚡</div>
+                        <h4>Simplicité</h4>
+                        <p>3 clics max pour créer ton QR. Pas de prise de tête, juste de l'efficacité.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="value-card animate-on-scroll">
+                        <div class="value-icon">🎨</div>
+                        <h4>Créativité</h4>
+                        <p>Ton event est unique, ton QR doit l'être aussi. Perso à fond !</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="value-card animate-on-scroll">
+                        <div class="value-icon">🌟</div>
+                        <h4>Communauté</h4>
+                        <p>On construit QRVibe AVEC vous. Vos retours façonnent notre produit.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="team-section">
+        <div class="container">
+            <h2 class="section-title animate-on-scroll">La team 👥</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="team-member animate-on-scroll">
+                        <div class="team-avatar">🎸</div>
+                        <h5>Alex</h5>
+                        <p>Co-founder & Designer</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="team-member animate-on-scroll">
+                        <div class="team-avatar">💻</div>
+                        <h5>Sam</h5>
+                        <p>Co-founder & Dev</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="team-member animate-on-scroll">
+                        <div class="team-avatar">🚀</div>
+                        <h5>Jordan</h5>
+                        <p>Growth & Community</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="container">
+            <h2 class="section-title" style="color: white;">QRVibe en chiffres 📊</h2>
+            <div class="row">
+                <div class="col-md-3 col-6">
+                    <div class="stat-box animate-on-scroll">
+                        <span class="stat-number">10K+</span>
+                        <span class="stat-label">QR créés</span>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-box animate-on-scroll">
+                        <span class="stat-number">5K+</span>
+                        <span class="stat-label">Utilisateurs</span>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-box animate-on-scroll">
+                        <span class="stat-number">50K+</span>
+                        <span class="stat-label">Scans totaux</span>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-box animate-on-scroll">
+                        <span class="stat-number">24/7</span>
+                        <span class="stat-label">Support actif</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block custom_script %}
+<script>
+    // Animate numbers for stats
+    function animateNumbers() {
+        const stats = document.querySelectorAll('.stat-number');
+        stats.forEach(stat => {
+            const target = stat.textContent.replace(/\D/g, '');
+            const suffix = stat.textContent.replace(/[0-9]/g, '');
+            let count = 0;
+            const increment = target / 50;
+            
+            const interval = setInterval(() => {
+                count += increment;
+                if (count >= target) {
+                    stat.textContent = target + suffix;
+                    clearInterval(interval);
+                } else {
+                    stat.textContent = Math.floor(count) + suffix;
+                }
+            }, 30);
+        });
+    }
+
+    // Trigger animation when stats section is visible
+    const statsObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                animateNumbers();
+                statsObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.5 });
+
+    const statsSection = document.querySelector('.stats-section');
+    if (statsSection) {
+        statsObserver.observe(statsSection);
+    }
+</script>
+{% endblock %}

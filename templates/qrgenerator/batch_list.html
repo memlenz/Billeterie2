@@ -1,0 +1,169 @@
+<!-- batch_list.html -->
+{% extends 'base.html' %}
+
+{% block title %}QRVibe - Gestion des lots de codes{% endblock %}
+
+{% block custom_style %}
+<style>
+    .batch-list-section {
+        padding: 6rem 0;
+        background: var(--light);
+    }
+
+    .header-section {
+        margin-bottom: 3rem;
+    }
+
+    .list-card {
+        border-radius: 20px;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .badge {
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+    }
+
+    .no-batches {
+        padding: 3rem 0;
+    }
+
+    .btn-primary-custom {
+        border-radius: 50px;
+    }
+
+    @media (max-width: 768px) {
+        .header-section {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .header-section .btn {
+            margin-top: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="batch-list-section">
+    <div class="container">
+        <div class="header-section d-flex justify-content-between align-items-center mb-4 animate-on-scroll">
+            <h1>Gestion des lots de codes 💼</h1>
+            <a href="{% url 'qrgenerator:batch_create' %}" class="btn btn-primary-custom">
+                <i class="bi bi-plus-lg"></i> Nouveau lot
+            </a>
+        </div>
+
+        <!-- {% if messages %} -->
+        <!--     {% for message in messages %} -->
+        <!--         <div class="alert alert-{{ message.tags }} alert-dismissible fade show animate-on-scroll" role="alert"> -->
+        <!--             {{ message }} -->
+        <!--             <button type="button" class="btn-close" data-bs-dismiss="alert"></button> -->
+        <!--         </div> -->
+        <!--     {% endfor %} -->
+        <!-- {% endif %} -->
+
+        <div class="list-card card animate-on-scroll">
+            <div class="card-header">
+                <h5 class="section-title mb-0">Mes lots de codes 🌟</h5>
+            </div>
+            <div class="card-body">
+                {% if page_obj %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Quantité</th>
+                                    <th>Statut</th>
+                                    <th>Date de création</th>
+                                    <th>Expiration</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for batch in page_obj %}
+                                <tr>
+                                    <td>{{ batch.name }}</td>
+                                    <td>{{ batch.quantity }}</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if batch.status == 'termine' %}bg-success
+                                            {% elif batch.status == 'en_cours' %}bg-warning
+                                            {% else %}bg-danger{% endif %}">
+                                            {{ batch.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ batch.created_at|date:"d/m/Y H:i" }}</td>
+                                    <td>{{ batch.expiration_date|date:"d/m/Y" }}</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{% url 'qrgenerator:batch_detail' batch.pk %}" 
+                                               class="btn btn-outline-primary" title="Voir les codes">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a href="{% url 'qrgenerator:batch_export' batch.pk %}" 
+                                               class="btn btn-outline-success" title="Télécharger ZIP">
+                                                <i class="bi bi-download"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if page_obj.has_other_pages %}
+                    <nav aria-label="Pagination">
+                        <ul class="pagination justify-content-center mt-4">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Précédent</a>
+                                </li>
+                            {% endif %}
+
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Suivant</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+
+                {% else %}
+                    <div class="text-center py-4 no-batches">
+                        <i class="bi bi-qr-code-scan fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">Aucun lot de codes créé pour le moment.</p>
+                        <a href="{% url 'qrgenerator:batch_create' %}" class="btn btn-primary-custom">
+                            Créer votre premier lot
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block custom_script %}
+<script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
+{% endblock %}

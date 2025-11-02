@@ -1,0 +1,186 @@
+<!-- code_detail.html -->
+{% extends 'base.html' %}
+
+{% block title %}QRVibe - Code #{{ code.id }}{% endblock %}
+
+{% block custom_style %}
+<style>
+    .code-detail-section {
+        padding: 6rem 0;
+        background: var(--light);
+    }
+
+    .detail-card {
+        border-radius: 24px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        transition: all 0.4s ease;
+    }
+
+    .detail-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .qr-card img {
+        max-width: 300px;
+        border-radius: 20px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .verification-card {
+        border-radius: 24px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .no-qr {
+        padding: 3rem 0;
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, var(--accent), var(--primary));
+        border: none;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-success:hover {
+        transform: translateY(-3px) scale(1.05);
+    }
+
+    .btn-outline-secondary {
+        border-radius: 50px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-secondary:hover {
+        transform: translateY(-3px);
+    }
+
+    dl.row dt {
+        font-weight: 600;
+        color: var(--dark);
+    }
+
+    dl.row dd {
+        color: #666;
+    }
+
+    @media (max-width: 768px) {
+        .row > div {
+            margin-bottom: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="code-detail-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="detail-card card animate-on-scroll">
+                    <div class="card-header">
+                        <h2 class="section-title mb-0">Détails du code 💫</h2>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row">
+                            <dt class="col-sm-4">ID:</dt>
+                            <dd class="col-sm-8">{{ code.id }}</dd>
+
+                            <dt class="col-sm-4">Lot:</dt>
+                            <dd class="col-sm-8">
+                                <a href="{% url 'qrgenerator:batch_detail' code.batch.pk %}">
+                                    {{ code.batch.name }}
+                                </a>
+                            </dd>
+
+                            <dt class="col-sm-4">Index sécurisé:</dt>
+                            <dd class="col-sm-8">
+                                <code class="text-break">{{ code.secure_index }}</code>
+                            </dd>
+
+                            <dt class="col-sm-4">Statut:</dt>
+                            <dd class="col-sm-8">
+                                <span class="badge 
+                                    {% if code.status == 'non_utilise' %}bg-success
+                                    {% elif code.status == 'utilise' %}bg-warning
+                                    {% else %}bg-danger{% endif %}">
+                                    {{ code.get_status_display }}
+                                </span>
+                            </dd>
+
+                            <dt class="col-sm-4">Date création:</dt>
+                            <dd class="col-sm-8">{{ code.created_at|date:"d/m/Y H:i" }}</dd>
+
+                            <dt class="col-sm-4">Expiration:</dt>
+                            <dd class="col-sm-8">{{ code.expiration_date|date:"d/m/Y" }}</dd>
+
+                            <dt class="col-sm-4">Hash:</dt>
+                            <dd class="col-sm-8">
+                                <small>
+                                    <code class="text-break text-muted">{{ code.secure_hash|truncatechars:50 }}</code>
+                                </small>
+                            </dd>
+                        </dl>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-start mt-4">
+                            <a href="{% url 'qrgenerator:code_download_qr' code.pk %}" 
+                               class="btn btn-success me-md-2">
+                                <i class="bi bi-download"></i> Télécharger QR Code
+                            </a>
+                            <a href="{% url 'qrgenerator:batch_detail' code.batch.pk %}" 
+                               class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Retour au lot
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="qr-card card animate-on-scroll">
+                    <div class="card-header">
+                        <h5 class="section-title mb-0">QR Code 📱</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        {% if code.qr_image %}
+                            <img src="{{ code.qr_image.url }}" 
+                                 alt="QR Code {{ code.secure_index }}" 
+                                 class="img-fluid rounded">
+                            <p class="text-muted mt-3">
+                                Scannez ce QR code pour valider le code
+                            </p>
+                        {% else %}
+                            <div class="text-center py-5 no-qr">
+                                <i class="bi bi-exclamation-triangle fa-3x text-warning mb-3"></i>
+                                <p class="text-muted">QR Code non disponible</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Verification info -->
+                <div class="verification-card card mt-4 animate-on-scroll">
+                    <div class="card-header">
+                        <h5 class="section-title mb-0">Vérification ✅</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Pour vérifier ce code :</p>
+                        <ul>
+                            <li>Scannez le QR code avec une application de lecture</li>
+                            <li>Ou utilisez l'index sécurisé dans l'interface de vérification</li>
+                        </ul>
+                        <a href="{% url 'qrgenerator:verify_code' %}" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-check-circle"></i> Aller à la vérification
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block custom_script %}
+<script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
+{% endblock %}

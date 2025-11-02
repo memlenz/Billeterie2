@@ -1,0 +1,22 @@
+[project]
+name = "Billeterie"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+  "django ~=5.1",
+  "django-allauth[openid,socialaccount] ~=65.2",
+  "django-debug-toolbar ~=4.4",
+  "crispy-bootstrap5 ~=2024.10",
+  "gunicorn~=23.0",
+  "psycopg[binary] ~=3.2",
+  "whitenoise ~=6.7",
+  "python-dotenv>=1.1.1",
+  "dj-database-url>=3.0.1",
+  "pillow>=12.0.0",
+  "qrcode>=8.2",
+  "pyzbar>=0.1.9",
+  "fedapay>=0.3.0",
+]
+
+[dependency-groups]
+dev = ["typing_extensions ~=4.12"]

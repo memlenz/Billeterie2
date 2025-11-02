@@ -1,0 +1,169 @@
+<!-- batch_create.html -->
+{% extends 'base.html' %}
+
+{% block title %}QRVibe - Créer un nouveau lot{% endblock %}
+
+{% block custom_style %}
+<style>
+    .batch-create-section {
+        padding: 6rem 0;
+        background: var(--light);
+    }
+
+    .batch-card {
+        background: white;
+        border-radius: 24px;
+        padding: 2.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        transition: all 0.4s ease;
+        border: 3px solid transparent;
+    }
+
+    .batch-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        border-color: var(--primary);
+    }
+
+    .card-title {
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        border: none;
+        border-radius: 50px;
+        font-weight: 700;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 191, 255, 0.3);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 8px 25px rgba(0, 191, 255, 0.5);
+    }
+
+    .btn-secondary {
+        border-radius: 50px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+        transform: translateY(-3px);
+    }
+
+    .form-control {
+        border-radius: 50px;
+    }
+
+    .info-card {
+        background: white;
+        border-radius: 24px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        margin-top: 2rem;
+    }
+
+    .info-card ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .info-card li {
+        margin-bottom: 1rem;
+        color: #666;
+    }
+
+    @media (max-width: 768px) {
+        .batch-card {
+            padding: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="batch-create-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="batch-card animate-on-scroll">
+                    <h2 class="card-title text-center mb-4">Créer un nouveau lot de codes 🔥</h2>
+                    
+                    <!-- {% if messages %} -->
+                    <!--     {% for message in messages %} -->
+                    <!--         <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert"> -->
+                    <!--             {{ message }} -->
+                    <!--             <button type="button" class="btn-close" data-bs-dismiss="alert"></button> -->
+                    <!--         </div> -->
+                    <!--     {% endfor %} -->
+                    <!-- {% endif %} -->
+
+                    <form method="post" id="batchForm">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nom du lot *</label>
+                            <input type="text" class="form-control" id="name" name="name" 
+                                   required maxlength="100" placeholder="Ex: Campagne Printemps 2024">
+                            <div class="form-text">Donnez un nom significatif à votre lot de codes.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="quantity" class="form-label">Nombre de codes *</label>
+                            <input type="number" class="form-control" id="quantity" name="quantity" 
+                                   required min="1" max="10000" value="10">
+                            <div class="form-text">Entre 1 et 10000 codes par lot.</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="validity_days" class="form-label">Validité (en jours) *</label>
+                            <input type="number" class="form-control" id="validity_days" name="validity_days" 
+                                   required min="1" max="365" value="30">
+                            <div class="form-text">Durée de validité des codes après leur création.</div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'qrgenerator:batch_list' %}" class="btn btn-secondary me-md-2">
+                                Annuler
+                            </a>
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                <i class="fas fa-spinner fa-spin d-none" id="spinner"></i>
+                                Créer le lot
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Information card -->
+                <div class="info-card animate-on-scroll">
+                    <h5 class="card-title text-center mb-3">Informations 💡</h5>
+                    <ul class="list-unstyled">
+                        <li><i class="bi bi-info-circle text-primary me-2"></i>La génération peut prendre quelques secondes</li>
+                        <li><i class="bi bi-shield-lock text-success me-2"></i>Chaque code est cryptographiquement sécurisé</li>
+                        <li><i class="bi bi-file-zip text-info me-2"></i>Vous pourrez télécharger tous les QR codes en ZIP</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block custom_script %}
+<script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
+<script>
+document.getElementById('batchForm').addEventListener('submit', function() {
+    const submitBtn = document.getElementById('submitBtn');
+    const spinner = document.getElementById('spinner');
+    
+    submitBtn.disabled = true;
+    spinner.classList.remove('d-none');
+    submitBtn.innerHTML = 'Génération en cours...';
+});
+</script>
+{% endblock %}

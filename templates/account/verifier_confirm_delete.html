@@ -1,0 +1,18 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Confirmer la suppression{% endblock %}
+
+{% block content %}
+<div class="container py-5 text-center">
+    <div class="card shadow-sm p-5 mx-auto" style="max-width: 500px;">
+        <h3>Supprimer le vérificateur <strong>{{ verifier.username }}</strong> ?</h3>
+        <p class="text-muted">Cette action est irréversible.</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger px-4">Oui, supprimer</button>
+            <a href="{% url 'accounts_verifiers:verifier_list' %}" class="btn btn-secondary px-4">Annuler</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

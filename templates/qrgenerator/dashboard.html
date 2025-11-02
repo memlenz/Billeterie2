@@ -1,0 +1,280 @@
+<!-- dashboard.html (updated) -->
+{% extends 'base.html' %}
+
+{% block title %}QRVibe - Tableau de bord{% endblock %}
+
+{% block custom_style %}
+<style>
+    .dashboard-section {
+        padding: 6rem 0;
+        background: var(--light);
+    }
+    .header-section {
+        margin-bottom: 3rem;
+    }
+    .stats-row .card {
+        border-radius: 20px;
+        transition: all 0.3s ease;
+    }
+    .stats-row .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+    .recent-card {
+        border-radius: 20px;
+    }
+    .actions-card {
+        border-radius: 20px;
+    }
+    .legend-card {
+        border-radius: 20px;
+    }
+    .no-recent {
+        padding: 3rem 0;
+    }
+    .btn-primary-custom, .btn-success {
+        border-radius: 50px;
+        transition: all 0.3s ease;
+    }
+    .btn-primary-custom:hover, .btn-success:hover {
+        transform: translateY(-3px) scale(1.05);
+    }
+    .btn-outline-primary, .btn-outline-success, .btn-outline-info {
+        border-radius: 50px;
+        transition: all 0.3s ease;
+    }
+    .btn-outline-primary:hover, .btn-outline-success:hover, .btn-outline-info:hover {
+        transform: translateY(-3px);
+    }
+    @media (max-width: 768px) {
+        .stats-row .col-md-3 {
+            margin-bottom: 1rem;
+        }
+        .row > div.col-md-8, .row > div.col-md-4 {
+            margin-bottom: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+{% block content %}
+<section class="dashboard-section">
+    <div class="container">
+        <div class="header-section d-flex justify-content-between align-items-center mb-4 animate-on-scroll">
+            <h1>Tableau de bord 📊</h1>
+            <div class="btn-group">
+                <a href="{% url 'qrgenerator:batch_create' %}" class="btn btn-primary-custom">
+                    <i class="bi bi-plus-lg"></i> Nouveau lot
+                </a>
+                <a href="{% url 'qrgenerator:verify_code' %}" class="btn btn-success">
+                    <i class="bi bi-check-circle"></i> Vérifier un code
+                </a>
+            </div>
+        </div>
+        <!-- Statistics for codes -->
+        <div class="row stats-row mb-4">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white animate-on-scroll">
+                    <div class="card-body d-flex justify-content-between">
+                        <div>
+                            <h4>{{ stats.total_batches }}</h4>
+                            <p class="mb-0">Lots créés</p>
+                        </div>
+                        <i class="bi bi-stack fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white animate-on-scroll">
+                    <div class="card-body d-flex justify-content-between">
+                        <div>
+                            <h4>{{ stats.total_codes }}</h4>
+                            <p class="mb-0">Total codes</p>
+                        </div>
+                        <i class="bi bi-qr-code-scan fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white animate-on-scroll">
+                    <div class="card-body d-flex justify-content-between">
+                        <div>
+                            <h4>{{ stats.codes_actifs }}</h4>
+                            <p class="mb-0">Codes actifs</p>
+                        </div>
+                        <i class="bi bi-check-circle fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-white animate-on-scroll">
+                    <div class="card-body d-flex justify-content-between">
+                        <div>
+                            <h4>{{ stats.codes_utilises }}</h4>
+                            <p class="mb-0">Codes utilisés</p>
+                        </div>
+                        <i class="bi bi-bar-chart fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- New Statistics for verifiers -->
+        <div class="row stats-row mb-4">
+            <div class="col-md-3">
+                <div class="card bg-secondary text-white animate-on-scroll">
+                    <div class="card-body d-flex justify-content-between">
+                        <div>
+                            <h4>{{ verifier_stats.total_verifiers }}</h4>
+                            <p class="mb-0">Vérificateurs</p>
+                        </div>
+                        <i class="bi bi-people fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white animate-on-scroll">
+                    <div class="card-body d-flex justify-content-between">
+                        <div>
+                            <h4>{{ verifier_stats.total_verifications }}</h4>
+                            <p class="mb-0">Vérifications totales</p>
+                        </div>
+                        <i class="bi bi-check-all fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-primary text-white animate-on-scroll">
+                    <div class="card-body d-flex justify-content-between">
+                        <div>
+                            <h4>{{ verifier_stats.active_verifiers }}</h4>
+                            <p class="mb-0">Vérificateurs actifs</p>
+                        </div>
+                        <i class="bi bi-person-check fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-white animate-on-scroll">
+                    <div class="card-body d-flex justify-content-between">
+                        <div>
+                            <h4>{{ verifier_stats.avg_verifications_per_verifier }}</h4>
+                            <p class="mb-0">Vérif. moyennes / vérificateur</p>
+                        </div>
+                        <i class="bi bi-graph-up fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <!-- Recent batches -->
+            <div class="col-md-8">
+                <div class="recent-card card animate-on-scroll">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="section-title mb-0">Lots récents 📅</h5>
+                        <a href="{% url 'qrgenerator:batch_list' %}" class="btn btn-sm btn-outline-primary">
+                            Voir tout
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        {% if recent_batches %}
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Nom</th>
+                                            <th>Quantité</th>
+                                            <th>Statut</th>
+                                            <th>Date création</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for batch in recent_batches %}
+                                        <tr>
+                                            <td>{{ batch.name }}</td>
+                                            <td>{{ batch.quantity }}</td>
+                                            <td>
+                                                <span class="badge
+                                                    {% if batch.status == 'termine' %}bg-success
+                                                    {% elif batch.status == 'en_cours' %}bg-warning
+                                                    {% else %}bg-danger{% endif %}">
+                                                    {{ batch.get_status_display }}
+                                                </span>
+                                            </td>
+                                            <td>{{ batch.created_at|date:"d/m/Y H:i" }}</td>
+                                            <td>
+                                                <a href="{% url 'qrgenerator:batch_detail' batch.pk %}"
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-4 no-recent">
+                                <i class="bi bi-inbox fa-2x text-muted mb-3"></i>
+                                <p class="text-muted">Aucun lot créé pour le moment.</p>
+                                <a href="{% url 'qrgenerator:batch_create' %}" class="btn btn-primary-custom">
+                                    Créer votre premier lot
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <!-- Quick actions -->
+            <div class="col-md-4">
+                <div class="actions-card card animate-on-scroll">
+                    <div class="card-header">
+                        <h5 class="section-title mb-0">Actions rapides ⚡</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'qrgenerator:batch_create' %}" class="btn btn-outline-primary text-start">
+                                <i class="bi bi-plus-lg me-2"></i>Créer un nouveau lot
+                            </a>
+                            <a href="{% url 'qrgenerator:verify_code' %}" class="btn btn-outline-success text-start">
+                                <i class="bi bi-check-circle me-2"></i>Vérifier un code
+                            </a>
+                            <a href="{% url 'qrgenerator:batch_list' %}" class="btn btn-outline-info text-start">
+                                <i class="bi bi-list-ul me-2"></i>Voir tous les lots
+                            </a>
+                            <a href="{% url 'verifier_create' %}" class="btn btn-outline-secondary text-start">
+                                <i class="bi bi-person-plus me-2"></i>Créer un vérificateur
+                            </a>
+                            <a href="{% url 'verifier_list' %}" class="btn btn-outline-secondary text-start">
+                                <i class="bi bi-people me-2"></i>Voir les vérificateurs
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Status legend -->
+                <div class="legend-card card mt-4 animate-on-scroll">
+                    <div class="card-header">
+                        <h5 class="section-title mb-0">Légende des statuts 🔑</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="badge bg-success me-2">&nbsp;</span>
+                            <small>Terminé - Prêt à l'utilisation</small>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="badge bg-warning me-2">&nbsp;</span>
+                            <small>En cours - Génération en cours</small>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="badge bg-danger me-2">&nbsp;</span>
+                            <small>Erreur - Problème lors de la génération</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block custom_script %}
+<script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
+{% endblock %}
